@@ -14,7 +14,7 @@ url = 'your ActiveCampaign URL'
 key = 'your ActiveCampaign API key'
 ```
 
-4. Run locally
+3. Run locally
 ```
 $ python3 app.py
 ```
