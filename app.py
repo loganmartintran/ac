@@ -4,7 +4,7 @@ from secrets import url
 from secrets import key
 
 # this grabs the list of test contacts created and returns the list id and the list name
-def getTestList():
+def get_test_list():
     querystring = {"api_action":"list_list","api_output":"json","ids":"all", "api_key": key}
     headers = {
         'Cache-Control': "no-cache",
@@ -17,7 +17,7 @@ def getTestList():
     return (data["0"]["id"], data["0"]["name"])
 
 # this returns a list of all contact emails
-def getContacts():
+def get_contacts():
     querystring = {"api_action":"contact_list","api_output":"json","ids":"all","api_key":key}
     headers = {
         'Cache-Control': "no-cache",
@@ -38,8 +38,8 @@ def getContacts():
     return contacts
 
 # this creates a basic email message using static data and returns the id for the message
-def createMessage():
-    listID, listName = getTestList()
+def create_message():
+    listID, listName = get_test_list()
     querystring = {"api_action":"message_add","api_output":"json","api_key": key}
     payload = {
         "format": "text",
@@ -73,9 +73,9 @@ def createMessage():
     return data["id"]
 
 # this creates a campaign with the name of the provided argument
-def createAndScheduleCampaign(name):
-    message = createMessage()
-    listID, listName = getTestList()
+def create_and_schedule_campaign(name):
+    message = create_message()
+    listID, listName = get_test_list()
     querystring = {"api_action":"campaign_create","api_output":"json","api_key": key}
     payload = {
         "type": "single",
@@ -96,11 +96,11 @@ def createAndScheduleCampaign(name):
         print(data["result_message"])
         return
     print(f'A new campaign called "{payload["name"]}" has been created for {listName}')
-    scheduleCampaign(data["id"], "2018-08-25 09:00:00")
-    sendCampaign(data["id"])
+    schedule_campaign(data["id"], "2018-08-25 09:00:00")
+    send_campaign(data["id"])
 
 # I am using this function solely to grab the campaign name for logging purposes
-def getCampaignName(campaignID):
+def get_campaign_name(campaignID):
     querystring = {"api_action":"campaign_list","api_output":"json","ids": campaignID,"api_key": key}
     headers = {
         'Cache-Control': "no-cache",
@@ -113,8 +113,8 @@ def getCampaignName(campaignID):
     return data["0"]["name"]
 
 # this schedules a campaign for the specified campaign id and date arguments
-def scheduleCampaign(campaignID, date):
-    campaignName = getCampaignName(campaignID)
+def schedule_campaign(campaignID, date):
+    campaignName = get_campaign_name(campaignID)
     querystring = {"api_action":"campaign_status","api_output":"json","id":campaignID,"status":"1","sdate":date,"api_key": key}
     headers = {
         'Cache-Control': "no-cache",
@@ -127,9 +127,9 @@ def scheduleCampaign(campaignID, date):
     print(f'The campaign "{campaignName}" has been successfully scheduled for {date}')
 
 # this sends a campaign for the specified campaign id to every contact
-def sendCampaign(campaignID):
-    campaignName = getCampaignName(campaignID)
-    contacts = getContacts()
+def send_campaign(campaignID):
+    campaignName = get_campaign_name(campaignID)
+    contacts = get_contacts()
     for contact in contacts:
         querystring = {"api_action":"campaign_send","api_output":"json","email":contact,"campaignid":campaignID,"type":"text","action":"send","api_key": key}
         headers = {
@@ -142,4 +142,4 @@ def sendCampaign(campaignID):
             return
         print(f'The campaign "{campaignName}" has been sent to {contact}')
 
-createAndScheduleCampaign("Dogs")
+create_and_schedule_campaign("Dogs")
